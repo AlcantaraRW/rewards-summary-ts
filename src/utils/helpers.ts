@@ -17,24 +17,39 @@ export function calculateBalance(
   userLevel: UserLevel
 ): Balance {
   let points = availablePoints;
+  const itemsToRedeem: ItemToRedeem[] = [];
 
-  const itemsToRedeem = availableCards.map((card) => {
+  for (let i = 0; i < availableCards.length; i++) {
+    const card = availableCards[i];
+    const lowerCard = availableCards[i + 1];
+
     const cost = getCardCost(card, userLevel);
-    let quantity = 0;
 
     while (points > cost) {
-      points -= cost;
-      quantity++;
+      if (!!lowerCard) {
+        const lowerCardDoublePrice = getCardCost(lowerCard, userLevel) * 2;
+
+        if (lowerCardDoublePrice <= points && lowerCardDoublePrice > cost) {
+          points -= lowerCardDoublePrice;
+          lowerCard.quantity += 2;
+        } else {
+          points -= cost;
+          card.quantity += 1;
+        }
+      } else {
+        points -= cost;
+        card.quantity += 1;
+      }
     }
 
     const item: ItemToRedeem = {
-      quantity,
+      quantity: card.quantity,
       cost,
       value: card.value,
     };
 
-    return item;
-  });
+    itemsToRedeem.push(item);
+  }
 
   const totalWorth = itemsToRedeem.reduce((acc, item) => acc + item.quantity * item.value, 0);
   const pointsToNextCard = getCardCost(availableCards[availableCards.length - 1], userLevel) - points;
@@ -61,7 +76,12 @@ export function calculateValuePredictions(
 ): string {
   return rewards
     .map((rew) => {
-      const { totalWorth } = calculateBalance(rew.options, totalPointsPrediction, userLevel);
+      const options = [...rew.options].map((opt) => ({
+        ...opt,
+        quantity: 0,
+      }));
+
+      const { totalWorth } = calculateBalance(options, totalPointsPrediction, userLevel);
       return currencyFormatter.format(totalWorth);
     })
     .join(' / ');
