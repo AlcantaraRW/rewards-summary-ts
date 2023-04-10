@@ -9,10 +9,19 @@ export const rewards: Reward[] = [
   //     { fullPrice: 1850, discountedPrice: 1750, value: 5, quantity: 0 },
   //   ],
   // },
+  // {
+  //   name: 'Americanas',
+  //   options: [
+  //     { fullPrice: 24150, value: 100, quantity: 0 },
+  //     { fullPrice: 7250, value: 30, quantity: 0 },
+  //     { fullPrice: 4850, value: 20, quantity: 0 },
+  //   ],
+  // },
   {
-    name: 'Americanas',
+    name: 'Via Cartão Presente',
     options: [
-      { fullPrice: 24150, value: 100, quantity: 0 },
+      { fullPrice: 24100, value: 100, quantity: 0 },
+      { fullPrice: 12050, value: 50, quantity: 0 },
       { fullPrice: 7250, value: 30, quantity: 0 },
       { fullPrice: 4850, value: 20, quantity: 0 },
     ],

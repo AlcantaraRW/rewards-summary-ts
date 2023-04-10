@@ -49,13 +49,14 @@ const interval = setInterval(async () => {
 
     const tableItems = itemsToRedeem.map((item) => ({
       value: currencyFormatter.format(item.value),
+      cost: numberFormatter.format(item.cost),
       quantity: numberFormatter.format(item.quantity),
       total: currencyFormatter.format(item.quantity * item.value),
     }));
 
     createStrong(container, rew.name);
 
-    createTable(container, ['Valor', 'Qtde', 'Total'], tableItems);
+    createTable(container, ['Valor', 'Custo', 'Qtde', 'Total'], tableItems);
     createStrong(container, `TOTAL: ${currencyFormatter.format(totalWorth)}`);
     createStrong(
       container,
