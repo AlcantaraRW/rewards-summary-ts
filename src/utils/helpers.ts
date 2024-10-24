@@ -1,10 +1,10 @@
-import { Balance, ItemToRedeem, WeekPoints } from '../models/Balance';
-import { RedeemableOption, Reward } from '../models/Reward';
-import { PointsSummary, UserLevel } from '../models/UserInfo';
-import { currencyFormatter, dayFormatter, weekDayFormatter, numberFormatter } from './formatters';
+import { Balance, ItemToRedeem, WeekPoints } from "../models/Balance";
+import { RedeemableOption, Reward } from "../models/Reward";
+import { PointsSummary, UserLevel } from "../models/UserInfo";
+import { currencyFormatter, dayFormatter, weekDayFormatter, numberFormatter } from "./formatters";
 
 export function getCardCost(card: RedeemableOption, userLevel: UserLevel) {
-  if (userLevel === 'Level2') {
+  if (userLevel === "Level2") {
     return card.discountedPrice ?? card.fullPrice;
   }
 
@@ -19,36 +19,18 @@ export function calculateBalance(
   let points = availablePoints;
   const itemsToRedeem: ItemToRedeem[] = [];
 
-  for (let i = 0; i < availableCards.length; i++) {
-    const card = availableCards[i];
-    const lowerCard = availableCards[i + 1];
-
+  for (const card of availableCards) {
     const cost = getCardCost(card, userLevel);
+    const quantity = Math.floor(points / cost);
 
-    while (points > cost) {
-      if (!!lowerCard) {
-        const lowerCardDoublePrice = getCardCost(lowerCard, userLevel) * 2;
+    card.quantity = quantity;
+    points -= quantity * cost;
 
-        if (lowerCardDoublePrice <= points && lowerCardDoublePrice > cost) {
-          points -= lowerCardDoublePrice;
-          lowerCard.quantity += 2;
-        } else {
-          points -= cost;
-          card.quantity += 1;
-        }
-      } else {
-        points -= cost;
-        card.quantity += 1;
-      }
-    }
-
-    const item: ItemToRedeem = {
-      quantity: card.quantity,
+    itemsToRedeem.push({
+      quantity,
       cost,
       value: card.value,
-    };
-
-    itemsToRedeem.push(item);
+    });
   }
 
   const totalWorth = itemsToRedeem.reduce((acc, item) => acc + item.quantity * item.value, 0);
@@ -84,7 +66,7 @@ export function calculateValuePredictions(
       const { totalWorth } = calculateBalance(options, totalPointsPrediction, userLevel);
       return currencyFormatter.format(totalWorth);
     })
-    .join(' / ');
+    .join(" / ");
 }
 
 export function getWeekPoints(today: Date, pointsSummary: PointsSummary[]): WeekPoints[] {
@@ -94,7 +76,7 @@ export function getWeekPoints(today: Date, pointsSummary: PointsSummary[]): Week
     const date = new Date(today.getFullYear(), today.getMonth(), currentDay - index);
 
     const result: WeekPoints = {
-      day: `${dayFormatter.format(date)}<br />(${weekDayFormatter.format(date).replace('.', '')})`,
+      day: `${dayFormatter.format(date)}<br />(${weekDayFormatter.format(date).replace(".", "")})`,
       points: numberFormatter.format(item.pointsEarned),
     };
 
